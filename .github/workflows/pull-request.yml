@@ -1,0 +1,72 @@
+name: 'Pull Request'
+
+on:
+  push:
+    branches: [ 'develop' ]
+  pull_request:
+    branches: [ 'develop' ]
+  workflow_dispatch:
+jobs:
+  run-lint-checks:
+    name: 'Run lint checks'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run lint check
+        uses: chartboost/ruff-action@v1
+        with:
+          src: "."
+
+  run-unit-tests:
+    name: 'Run unit tests'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+          architecture: 'x64'
+          cache: 'pip'
+
+      - name: Check Python version
+        run: python --version
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests and generate coverage report
+        run: pytest ./test --doctest-modules --junitxml=junit/test-results.xml --cov=./ --cov-report=xml --cov-report=html
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  run-action-tests:
+    runs-on: ubuntu-latest
+    name: 'Test action'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get list of branch names
+        id: branch-names
+        run: echo "branches=develop main" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Concat to array values
+        uses: ./
+        id: array-concat
+        with:
+          array: ${{ steps.branch-names.outputs.branches }}
+          template: 'repo{{element}}Branch'
+          case: 'pascal'
+
+      - name: Echo the concatenated values
+        run: |
+          echo "Array: ${{ steps.array-concat.outputs.formatted-array }}"
+          echo "String: ${{ steps.array-concat.outputs.formatted-string }}"
