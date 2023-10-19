@@ -1,4 +1,4 @@
-name: 'Array Element Template'
+name: 'Array Template'
 description: 'Apply a uniform template to each array element for consistent string formatting.'
 author: 'Andrew Keller'
 branding:
