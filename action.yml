@@ -26,52 +26,26 @@ inputs:
     required: false
     default: '^[a-zA-Z0-9 _./-]+$'
 outputs:
-  formatted-array:
-    description: 'Array with each element formatted to the specified template.'
-    value: ${{ steps.concat-array.outputs.formatted-array }}
-  formatted-string:
-    description: 'String with each array element formatted to the specified template.'
-    value: ${{ steps.concat-array.outputs.formatted-string }}
+  json-array:
+    description: 'JSON array with each element formatted to the specified template.'
+    value: ${{ steps.process-input.outputs.json-array }}
 runs:
   using: 'composite'
   steps:
-    - name: Extract branch, tag, or PR base branch name
-      run: |
-        if [ "${{ github.event_name }}" == "pull_request" ]; then
-          echo "REF_NAME=${{ github.head_ref }}" >> $GITHUB_ENV
-        else
-          ref="${GITHUB_REF#refs/}"
-          if [[ "$ref" == "tags/"* ]]; then
-            echo "REF_NAME=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
-          elif [[ "$ref" == "heads/"* ]]; then
-            echo "REF_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
-          fi
-        fi
-      shell: bash
-      env:
-        GITHUB_REF: ${{ github.ref }}
-
-    - name: Use current ref name
-      run: echo "Current ref is ${{ env.REF_NAME }}"
-      shell: bash
-
     - name: Checkout action repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: 'palacera/github-action-array-element-template'
-        ref: ${{ env.REF_NAME }}
         path: 'action-array-element-template'
 
-    - id: concat-array
+    - id: process-input
       run: |
         IFS=' ' read -ra ARRAY <<< "${{ inputs.array }}"
-        array_output=$(python3 action-array-element-template/array_element_template.py \
+        output=$(python3 action-array-element-template/array_element_template.py \
         -a "${ARRAY[@]}" \
         -t "${{ inputs.template }}" \
         -c "${{ inputs.case }}" \
         -w "${{ inputs.word-delimiter }}" \
         -p "${{ inputs.validation-pattern }}")
-        string_output="${array_output[*]}"
-        echo "formatted-array=$array_output" >> $GITHUB_OUTPUT
-        echo "formatted-string=$string_output" >> $GITHUB_OUTPUT
+        echo "json-array=$output" >> $GITHUB_OUTPUT
       shell: bash

@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Run lint check
         uses: chartboost/ruff-action@v1
@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -49,24 +49,37 @@ jobs:
 
   run-action-tests:
     runs-on: ubuntu-latest
-    name: 'Test action'
+    name: 'Run action test'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Get list of branch names
         id: branch-names
         run: echo "branches=develop main" >> $GITHUB_OUTPUT
         shell: bash
 
-      - name: Concat to array values
+      - name: Process string list
         uses: ./
-        id: array-concat
+        id: string-list
         with:
           array: ${{ steps.branch-names.outputs.branches }}
           template: 'repo{{element}}Branch'
           case: 'pascal'
 
-      - name: Echo the concatenated values
+      - name: Test json
+        env:
+          ACTUAL_VALUE: ${{ steps.string-list.outputs.json-array }}
+        shell: bash
         run: |
-          echo "Array: ${{ steps.array-concat.outputs.formatted-array }}"
-          echo "String: ${{ steps.array-concat.outputs.formatted-string }}"
+          function print_error {
+            echo -e "\033[0;31m$1\033[0m"
+          }
+          
+          EXPECTED_VALUE='["repoDevelopBranch", "repoMainBranch"]'
+          
+          if [[ "$ACTUAL_VALUE" == "$EXPECTED_VALUE" ]]; then
+            echo "Success: $ACTUAL_VALUE"
+          else
+            print_error "Failure: Actual value '$ACTUAL_VALUE' does not match expected value '$EXPECTED_VALUE'."
+            exit 1
+          fi
