@@ -11,9 +11,11 @@ class CamelCaseTransformer:
         if not words:
             return ""
 
-        camel_case_segment = words[0] + ''.join(x.capitalize() for x in words[1:])
+        camel_case_segment = (words[0] +
+                              ''.join(x.capitalize() for x in words[1:]))
         if not is_lower:
-            camel_case_segment = camel_case_segment[0].upper() + camel_case_segment[1:]
+            camel_case_segment = (camel_case_segment[0].upper() +
+                                  camel_case_segment[1:])
         return camel_case_segment
 
     @staticmethod

@@ -1,4 +1,5 @@
 import argparse
+import sys
 
 from src.argument_model import ArgumentModel
 
@@ -13,3 +14,7 @@ class ArgumentParserExt(argparse.ArgumentParser):
             required=argument.is_required,
             help=argument.description,
         )
+
+    def error(self, message):
+        self.print_usage(sys.stderr)
+        self.exit(2, f"\033[91mError: {message}\033[0m\n")

@@ -2,6 +2,7 @@ from src.array_template_arguments import ArrayTemplateArguments
 from src.placeholder_model import PlaceholderModel
 from src.template_model import TemplateModel
 from src.template_processor import TemplateProcessor
+import json
 
 
 def get_placeholder():
@@ -25,12 +26,17 @@ def map_arguments_to_template_model(args):
 
 
 def main(arguments):
-    template = map_arguments_to_template_model(arguments)
-    processor = TemplateProcessor(template)
-    output = processor.generate_output()
+    try:
+        template = map_arguments_to_template_model(arguments)
+        processor = TemplateProcessor(template)
+        output = processor.generate_output()
 
-    print(output)
+        print(json.dumps(output))
+    except Exception as e:
+        print(f"\033[31mError: {e}\033[0m")
+        exit(1)
 
 
 if __name__ == "__main__":
     main(ArrayTemplateArguments().parse_args())
+

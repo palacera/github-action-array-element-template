@@ -10,29 +10,27 @@ Example usages of running gradle tasks for a multi-project build:
 #### With array of strings
 
 ```yaml
-- uses: palacera/github-action-array-element-template@v0.1.0
+- uses: palacera/github-action-array-element-template@v0.2.0
   id: build-projects-tasks
   with:
     array: ${{ steps.third-party-var.outputs.projects }} # ie. ['core', 'feature']
     template: 'build{{element}}Task'
-    case: 'pascal'
+    case: 'pascal' # is applied only to element
 
-- run: ./gradlew ${{ steps.build-projects-tasks.outputs.formatted-string }}
-# runs: ./gradlew buildCoreTask buildFeatureTask
+- run: echo ${{ steps.build-projects-tasks.outputs.json-array }}
 ```
 
 #### With array of objects
 
 ```yaml
-- uses: palacera/github-action-array-element-template@v0.1.0
+- uses: palacera/github-action-array-element-template@v0.2.0
   id: build-projects-tasks
   with:
     array: ${{ steps.third-party-var.outputs.projects }} # ie. [{"type":"core", "version":""}, {"type":"feature", "version":"snapshot"}]
     template: 'build{{element.type}}{{element.version}}Task'
-    case: 'pascal'
+    case: 'pascal' # is applied only to elements
 
-- run: ./gradlew ${{ steps.build-projects-tasks.outputs.formatted-string }}
-# runs: ./gradlew buildCoreTask buildFeatureSnapshotTask
+- run: echo ${{ steps.build-projects-tasks.outputs.json-array }}
 ```
 
 ### Inputs
@@ -47,9 +45,9 @@ Example usages of running gradle tasks for a multi-project build:
 
 ### Outputs
 
-|       Output       | Description                                                         |
-|:------------------:|---------------------------------------------------------------------|
-| `formatted-string` | Array with each element formatted to the specified template.        |
-| `formatted-array`  | String with each array element formatted to the specified template. |
+|      Output       | Description                                                         |
+|:-----------------:|---------------------------------------------------------------------|
+|   `json-array`    | JSON array with each element formatted to the specified template.   |
+
 
 
