@@ -1,4 +1,6 @@
 import pytest
+from contextlib import redirect_stderr
+from io import StringIO
 
 from src.argument_model import ArgumentModel
 from src.argument_parser_utilities import ArgumentParserExt
@@ -38,7 +40,7 @@ def argument_model():
         id='long argument',
     ),
     pytest.param(
-        ['--invalid', 'lorem'],
+        ['-a', 'lorem', '--invalid', 'ipsum'],
         None,
         SystemExit,
         '2',
@@ -53,7 +55,8 @@ def test_add_argument_model_argument(
 
     if exception:
         with pytest.raises(exception, match=message):
-            argument_parser.parse_args(argument)
+            with redirect_stderr(StringIO()):
+                argument_parser.parse_args(argument)
     else:
         args = argument_parser.parse_args(argument)
         assert args.argument == expected

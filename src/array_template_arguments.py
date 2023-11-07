@@ -10,7 +10,6 @@ class ArrayTemplateArguments(ArgumentParserExt):
         short_option='-a',
         long_option='--array',
         is_required=True,
-        is_list=True,
     )
 
     template_argument_model = ArgumentModel(

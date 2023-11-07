@@ -39,13 +39,18 @@ runs:
         path: 'action-array-element-template'
 
     - id: process-input
-      run: |
-        IFS=' ' read -ra ARRAY <<< "${{ inputs.array }}"
-        output=$(python3 action-array-element-template/array_element_template.py \
-        -a "${ARRAY[@]}" \
-        -t "${{ inputs.template }}" \
-        -c "${{ inputs.case }}" \
-        -w "${{ inputs.word-delimiter }}" \
-        -p "${{ inputs.validation-pattern }}")
-        echo "json-array=$output" >> $GITHUB_OUTPUT
+      env:
+        ARRAY: ${{ inputs.array }}
+        TEMPLATE: ${{ inputs.template }}
+        CASE: ${{ inputs.case }}
+        WORD_DELIMITER: ${{ inputs.word-delimiter }}
+        VALIDATION_PATTERN: ${{ inputs.validation-pattern }}
       shell: bash
+      run: |
+        output=$(python3 action-array-element-template/array_element_template.py \
+        -a "$ARRAY" \
+        -t "$TEMPLATE" \
+        -c "$CASE" \
+        -w "$WORD_DELIMITER" \
+        -p "$VALIDATION_PATTERN")
+        echo "json-array=$output" >> $GITHUB_OUTPUT

@@ -15,7 +15,7 @@ def test_placeholder():
 
 def test_template_model():
     arguments = Namespace(
-        array=['input'],
+        array='["input"]',
         template='{{element}}',
         case='none',
         word_delimiter='-',

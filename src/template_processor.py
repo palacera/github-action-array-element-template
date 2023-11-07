@@ -1,5 +1,4 @@
 from typing import List, Union, Any
-import json
 import re
 
 from src.camel_case_transformer import CamelCaseTransformer
@@ -10,35 +9,28 @@ from src.string_utilities import replace_word_delimiters, separate_words
 class TemplateProcessor:
     def __init__(self, template_model: Any):
         self.template_model = template_model
-        self.input_array: List[Any] = self.process_array(template_model.array)
+        self.validate_list(template_model.array)
 
-    def process_array(self, array: List[str]) -> List[Any]:
-        input_array: List[Any] = []
-        current_type = None
+    def allOfType(self, list, type):
+        return all(isinstance(item, type) for item in list)
 
-        for item in array:
-            if not isinstance(item, str):
-                raise TypeError("Must be a list of strings or json strings.")
+    def allDictsHaveSameKeys(self, list):
+        first_dict_keys = set(list[0].keys())
+        return all(first_dict_keys == set(d.keys()) for d in list)
 
-            try:
-                parsed_item = json.loads(item)
-                if isinstance(parsed_item, list):
-                    item_type = 1
-                    input_array.extend(parsed_item)
-                else:
-                    item_type = 2
-                    input_array.append(parsed_item)  # Fixed line
-            except json.JSONDecodeError:
-                item_type = 1
-                input_array.append(item)
+    def validate_list(self, array: List[str]) -> List[Any]:
 
-            if current_type is not None and item_type != current_type:
-                raise TypeError(
-                    "Must be either a list of strings or a list of objects.")
+        if self.allOfType(array, str):
+            return array
 
-            current_type = item_type
+        if self.allOfType(array, dict):
+            if self.allDictsHaveSameKeys(array):
+                return array
+            else:
+                raise ValueError("All dictionaries must have the same keys.")
 
-        return input_array
+        raise TypeError(
+            "Must be either a list of strings or a list of dictionaries.")
 
     def transform_case(self, value: str, mode: str = 'none') -> str:
         if not isinstance(value, str):
@@ -145,7 +137,7 @@ class TemplateProcessor:
     def generate_output(self) -> List[str]:
         output = []
 
-        for element in self.input_array:
+        for element in self.template_model.array:
             output.append(self.replace_template_values(element))
 
         return output
