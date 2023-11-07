@@ -55,7 +55,7 @@ jobs:
 
       - name: Get list of branch names
         id: branch-names
-        run: echo "branches=develop main" >> $GITHUB_OUTPUT
+        run: echo "branches=['develop', 'main']" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Process string list

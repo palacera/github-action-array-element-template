@@ -22,7 +22,7 @@ def test_template_model():
         validation_pattern='[a-z]',
     )
     result = map_arguments_to_template_model(arguments)
-    assert result.array == ['input']
+    assert result.array == '["input"]'
     assert result.template == '{{element}}'
     assert result.case == 'none'
     assert result.word_delimiter == '-'
