@@ -3,7 +3,7 @@ import json
 import re
 
 
-def to_json(input):
+def to_iterable(input):
     try:
         temp = re.sub(r':\s*\bfalse\b', ':False', input, flags=re.IGNORECASE)
         temp = re.sub(r':\s*\btrue\b', ':True', temp, flags=re.IGNORECASE)
@@ -12,11 +12,9 @@ def to_json(input):
         pass
 
     if isinstance(input, list) or isinstance(input, dict):
-        return json.dumps(input)
+        return input
 
     try:
-        json.loads(input)
+        return json.loads(input)
     except Exception:
-        raise ValueError("Invalid JSON.")
-
-    return input
+        raise ValueError("Could not convert input to iterable.")

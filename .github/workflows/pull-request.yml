@@ -83,3 +83,40 @@ jobs:
             print_error "Failure: Actual value '$ACTUAL_VALUE' does not match expected value '$EXPECTED_VALUE'."
             exit 1
           fi
+
+  run-action-tests-object:
+    runs-on: ubuntu-latest
+    name: 'Run action test'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get list of branch names
+        id: branch-names
+        run: echo "branches=[{'branch':'develop','env':'prod'},{'branch':'main','env':'dev'}]" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Process string list
+        uses: ./
+        id: string-list
+        with:
+          array: ${{ steps.branch-names.outputs.branches }}
+          template: 'repo{{element.branch}}{{element.env}}Branch'
+          case: 'pascal'
+
+      - name: Test json
+        env:
+          ACTUAL_VALUE: ${{ steps.string-list.outputs.json-array }}
+        shell: bash
+        run: |
+          function print_error {
+            echo -e "\033[0;31m$1\033[0m"
+          }
+          
+          EXPECTED_VALUE='["repoDevelopProdBranch", "repoMainDevBranch"]'
+          
+          if [[ "$ACTUAL_VALUE" == "$EXPECTED_VALUE" ]]; then
+            echo "Success: $ACTUAL_VALUE"
+          else
+            print_error "Failure: Actual value '$ACTUAL_VALUE' does not match expected value '$EXPECTED_VALUE'."
+            exit 1
+          fi

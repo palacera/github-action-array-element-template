@@ -1,5 +1,5 @@
 from src.array_template_arguments import ArrayTemplateArguments
-from src.json import to_json
+from src.iterable_utilities import to_iterable
 from src.placeholder_model import PlaceholderModel
 from src.template_model import TemplateModel
 from src.template_processor import TemplateProcessor
@@ -18,7 +18,7 @@ def get_placeholder():
 def map_arguments_to_template_model(args):
     return TemplateModel(
         placeholder_model=get_placeholder(),
-        array=to_json(args.array),
+        array=to_iterable(args.array),
         template=args.template,
         case=args.case,
         word_delimiter=args.word_delimiter,

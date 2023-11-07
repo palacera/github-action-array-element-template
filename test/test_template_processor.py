@@ -33,7 +33,6 @@ def template_processor_instance(mock_template_model):
 
 # noinspection PyTypeChecker
 class TestTemplateProcessor(object):
-
     @pytest.mark.parametrize('original, expected, exception, exception_msg', [
         pytest.param(
             ['a', 'b', 'c'],
@@ -43,29 +42,35 @@ class TestTemplateProcessor(object):
             id='test list of strings'
         ),
         pytest.param(
-            ['[{"a": "x"}, {"b": "y"}, {"c": "z"}]'],
-            [{"a": "x"}, {"b": "y"}, {"c": "z"}],
+            [{"a": "x"}, {"a": "y"}, {"a": "z"}],
+            [{"a": "x"}, {"a": "y"}, {"a": "z"}],
             None,
             None,
-            id='test list of json strings'
+            id='test list of dictionaries'
         ),
         pytest.param(
-            ['a', None, 'c'],
+            [1, 2, 3],
             None,
             TypeError,
-            "Must be a list of strings or json strings.",
+            "Must be either a list of strings or a list of dictionaries.",
             id='test invalid element in array'
         ),
         pytest.param(
-            ['a', '{"b": "y"}', 'c'],
+            ['a', {"b": "y"}, 'c'],
             None,
             TypeError,
-            "Must be either a list of strings or a list of objects.",
-            id='test mix of list of strings and json objects'
+            "Must be either a list of strings or a list of dictionaries.",
+            id='test mix of list of strings or dictionaries'
         ),
-        # TODO check for invalid json
+        pytest.param(
+            [{"a": "x"}, {"b": "y"}, {"c": "z"}],
+            None,
+            ValueError,
+            "All dictionaries must have the same keys.",
+            id='test list of dictionaries with different keys'
+        ),
     ])
-    def test_process_array(
+    def test_validate_array(
             self, mock_template_model, original,
             expected, exception, exception_msg):
         mock_template_model.array = original
@@ -75,7 +80,7 @@ class TestTemplateProcessor(object):
                 TemplateProcessor(mock_template_model)
         else:
             processor = TemplateProcessor(mock_template_model)
-            assert processor.input_array == expected
+            assert processor.template_model.array == expected
 
     @pytest.mark.parametrize(
         'case_mode, original, expected, exception, exception_msg', [
@@ -253,7 +258,7 @@ class TestTemplateProcessor(object):
                                                  exception, exception_msg):
         mock_template_model.template = template
         processor = TemplateProcessor(mock_template_model)
-        processor.input_array = original
+        processor.template_model.array = original
         result = processor.generate_output()
         assert result == expected
 
@@ -346,13 +351,13 @@ class TestTemplateProcessor(object):
         mock_template_model.case = case
         mock_template_model.template = template
         processor = TemplateProcessor(mock_template_model)
-        processor.input_array = original
+        processor.template_model.array = original
         result = processor.generate_output()
         assert result == expected
 
     def test_returns_correct_case(self, mock_template_model):
         mock_template_model.case = 'upper'
         processor = TemplateProcessor(mock_template_model)
-        processor.input_array = ['ipsum', 'sit']
+        processor.template_model.array = ['ipsum', 'sit']
         result = processor.generate_output()
         assert result == ['lorem-IPSUM', 'lorem-SIT']
