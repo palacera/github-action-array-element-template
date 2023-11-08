@@ -48,75 +48,57 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   run-action-tests:
+    strategy:
+      matrix:
+        config: [
+          {
+            name: 'string array with double quotes',
+            array: '["main", "develop"]',
+            template: 'repo{{element}}Branch',
+            case: 'pascal',
+            expected_output: '["repoMainBranch", "repoDevelopBranch"]'
+          },
+          {
+            name: 'string array with single quotes',
+            array: "['main', 'develop']",
+            template: 'repo{{element}}Branch',
+            case: 'pascal',
+            expected_output: '["repoMainBranch", "repoDevelopBranch"]'
+          },
+          {
+            name: 'object array with double quotes',
+            array: '[{"branch":"main","env":"dev"},{"branch":"develop","env":"prod"}]',
+            template: 'repo{{element.branch}}Branch{{element.env}}',
+            case: 'pascal',
+            expected_output: '["repoMainBranchDev", "repoDevelopBranchProd"]'
+          },
+          {
+            name: 'object array with single quotes',
+            array: "[{'branch':'main','env':'dev'},{'branch':'develop','env':'prod'}]",
+            template: 'repo{{element.branch}}Branch{{element.env}}',
+            case: 'pascal',
+            expected_output: '["repoMainBranchDev", "repoDevelopBranchProd"]'
+          },
+        ]
     runs-on: ubuntu-latest
-    name: 'Run action test'
+    name: Test ${{ matrix.config.name }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Get list of branch names
-        id: branch-names
-        run: echo "branches=['develop', 'main']" >> $GITHUB_OUTPUT
-        shell: bash
-
-      - name: Process string list
+      - name: Apply array element template
         uses: ./
-        id: string-list
+        id: array-template
         with:
-          array: ${{ steps.branch-names.outputs.branches }}
-          template: 'repo{{element}}Branch'
-          case: 'pascal'
+          array: ${{ matrix.config.array }}
+          template: ${{ matrix.config.template }}
+          case: ${{ matrix.config.case }}
 
-      - name: Test json
+      - name: Test output
         env:
-          ACTUAL_VALUE: ${{ steps.string-list.outputs.json-array }}
+          EXPECTED_VALUE: ${{ matrix.config.expected_output }}
+          ACTUAL_VALUE: ${{ steps.array-template.outputs.json-array }}
         shell: bash
         run: |
-          function print_error {
-            echo -e "\033[0;31m$1\033[0m"
-          }
-          
-          EXPECTED_VALUE='["repoDevelopBranch", "repoMainBranch"]'
-          
-          if [[ "$ACTUAL_VALUE" == "$EXPECTED_VALUE" ]]; then
-            echo "Success: $ACTUAL_VALUE"
-          else
-            print_error "Failure: Actual value '$ACTUAL_VALUE' does not match expected value '$EXPECTED_VALUE'."
-            exit 1
-          fi
-
-  run-action-tests-object:
-    runs-on: ubuntu-latest
-    name: 'Run action test'
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Get list of branch names
-        id: branch-names
-        run: echo "branches=[{'branch':'develop','env':'prod'},{'branch':'main','env':'dev'}]" >> $GITHUB_OUTPUT
-        shell: bash
-
-      - name: Process string list
-        uses: ./
-        id: string-list
-        with:
-          array: ${{ steps.branch-names.outputs.branches }}
-          template: 'repo{{element.branch}}{{element.env}}Branch'
-          case: 'pascal'
-
-      - name: Test json
-        env:
-          ACTUAL_VALUE: ${{ steps.string-list.outputs.json-array }}
-        shell: bash
-        run: |
-          function print_error {
-            echo -e "\033[0;31m$1\033[0m"
-          }
-          
-          EXPECTED_VALUE='["repoDevelopProdBranch", "repoMainDevBranch"]'
-          
-          if [[ "$ACTUAL_VALUE" == "$EXPECTED_VALUE" ]]; then
-            echo "Success: $ACTUAL_VALUE"
-          else
-            print_error "Failure: Actual value '$ACTUAL_VALUE' does not match expected value '$EXPECTED_VALUE'."
-            exit 1
-          fi
+          source ./scripts/assertions.sh
+          assert_equal "$EXPECTED_VALUE" "$ACTUAL_VALUE"          
