@@ -47,10 +47,19 @@ runs:
         VALIDATION_PATTERN: ${{ inputs.validation-pattern }}
       shell: bash
       run: |
+        set +e  # Disable automatic exit on error
         output=$(python3 action-array-element-template/array_element_template.py \
         -a "$ARRAY" \
         -t "$TEMPLATE" \
         -c "$CASE" \
         -w "$WORD_DELIMITER" \
         -p "$VALIDATION_PATTERN")
-        echo "json-array=$output" >> $GITHUB_OUTPUT
+        exit_status=$?
+        if [ $exit_status -ne 0 ]; then
+          echo "$output"
+          echo "::error ::Python script execution failed"  # Error annotation
+          exit $exit_status
+        else
+          echo "json-array=$output" >> $GITHUB_OUTPUT
+        fi
+        set -e  # Re-enable automatic exit on error
