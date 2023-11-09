@@ -10,10 +10,10 @@ Example usages of running gradle tasks for a multi-project build:
 #### With array of strings
 
 ```yaml
-- uses: palacera/github-action-array-element-template@v0.2.1
+- uses: palacera/github-action-array-element-template@latest
   id: build-projects-tasks
   with:
-    array: ${{ steps.third-party-var.outputs.projects }} # ie. ['core', 'feature']
+    array: ${{ steps.third-party-var.outputs.projects }} # ie. '["core", "feature"]'
     template: 'build{{element}}Task'
     case: 'pascal' # is applied only to element
 
@@ -23,10 +23,10 @@ Example usages of running gradle tasks for a multi-project build:
 #### With array of objects
 
 ```yaml
-- uses: palacera/github-action-array-element-template@v0.2.1
+- uses: palacera/github-action-array-element-template@latest
   id: build-projects-tasks
   with:
-    array: ${{ steps.third-party-var.outputs.projects }} # ie. [{"type":"core", "version":""}, {"type":"feature", "version":"snapshot"}]
+    array: ${{ steps.third-party-var.outputs.projects }} # ie. '[{"type":"core", "version":""}, {"type":"feature", "version":"snapshot"}]'
     template: 'build{{element.type}}{{element.version}}Task'
     case: 'pascal' # is applied only to elements
 
