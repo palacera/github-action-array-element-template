@@ -9,7 +9,7 @@ class PlaceholderModel:
     right_delimiter: str
     key_delimiter: str
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if not isinstance(self.text, str):
             raise TypeError("Placeholder text must be a string.")
 

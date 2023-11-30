@@ -1,12 +1,13 @@
 import argparse
 import sys
+from typing import NoReturn
 
 from src.argument_model import ArgumentModel
 
 
 class ArgumentParserExt(argparse.ArgumentParser):
 
-    def add_argument_model(self, argument: ArgumentModel):
+    def add_argument_model(self, argument: ArgumentModel) -> None:
         self.add_argument(
             argument.short_option, argument.long_option,
             default=argument.default_value,
@@ -15,6 +16,6 @@ class ArgumentParserExt(argparse.ArgumentParser):
             help=argument.description,
         )
 
-    def error(self, message):
+    def error(self, message: str) -> NoReturn:
         self.print_usage(sys.stderr)
         self.exit(2, f"\033[91mError: {message}\033[0m\n")

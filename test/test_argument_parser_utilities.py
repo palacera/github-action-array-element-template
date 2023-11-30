@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 from contextlib import redirect_stderr
 from io import StringIO
@@ -7,12 +9,12 @@ from src.argument_parser_utilities import ArgumentParserExt
 
 
 @pytest.fixture
-def argument_parser():
+def argument_parser() -> ArgumentParserExt:
     return ArgumentParserExt()
 
 
 @pytest.fixture
-def argument_model():
+def argument_model() -> ArgumentModel:
     return ArgumentModel(
         name='argument',
         short_option='-a',
@@ -48,9 +50,13 @@ def argument_model():
     ),
 ])
 def test_add_argument_model_argument(
-        argument_parser, argument_model, argument,
-        expected, exception, message
-):
+        argument_parser: ArgumentParserExt,
+        argument_model: ArgumentModel,
+        argument: Any,
+        expected: Any,
+        exception: Any,
+        message: Any,
+) -> None:
     argument_parser.add_argument_model(argument_model)
 
     if exception:
@@ -62,14 +68,20 @@ def test_add_argument_model_argument(
         assert args.argument == expected
 
 
-def test_add_argument_model_default_value(argument_parser, argument_model):
+def test_add_argument_model_default_value(
+        argument_parser: ArgumentParserExt,
+        argument_model: ArgumentModel,
+) -> None:
     argument_model.is_required = False
     argument_parser.add_argument_model(argument_model)
     args = argument_parser.parse_args([])
     assert args.argument == 'default'
 
 
-def test_add_argument_model_is_list(argument_parser, argument_model):
+def test_add_argument_model_is_list(
+        argument_parser: ArgumentParserExt,
+        argument_model: ArgumentModel,
+) -> None:
     argument_model.is_list = True
     argument_parser.add_argument_model(argument_model)
     args = argument_parser.parse_args(['-a', 'value1', 'value2'])

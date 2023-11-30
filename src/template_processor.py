@@ -1,4 +1,4 @@
-from typing import List, Union, Any
+from typing import List, Union, Any, Type, Dict, cast
 import re
 
 from src.camel_case_transformer import CamelCaseTransformer
@@ -11,14 +11,14 @@ class TemplateProcessor:
         self.template_model = template_model
         self.validate_list(template_model.array)
 
-    def allOfType(self, list, type):
+    def allOfType(self, list: List[Any], type: Type) -> bool:
         return all(isinstance(item, type) for item in list)
 
-    def allDictsHaveSameKeys(self, list):
+    def allDictsHaveSameKeys(self, list: List[Dict[Any, Any]]) -> bool:
         first_dict_keys = set(list[0].keys())
         return all(first_dict_keys == set(d.keys()) for d in list)
 
-    def validate_list(self, array: List[str]) -> List[Any]:
+    def validate_list(self, array: List[Any]) -> List[Any]:
 
         if self.allOfType(array, str):
             return array
@@ -57,7 +57,7 @@ class TemplateProcessor:
     def get_nested_value(self, element: Union[dict, str], key: str) -> Any:
         key_split = (
             key.split(self.template_model.placeholder_model.key_delimiter))
-        value = element
+        value: Any = element
         for k in key_split:
             if isinstance(value, dict):
                 value = value.get(k)
@@ -70,7 +70,7 @@ class TemplateProcessor:
         expects_object = isinstance(element, dict)
         placeholder = self.template_model.placeholder_model
 
-        def replacer(match):
+        def replacer(match: re.Match[str]) -> str:
             match.group(0)
             key = match.group(1)
 
@@ -127,7 +127,8 @@ class TemplateProcessor:
             + re.escape(placeholder.right_delimiter)
         )
 
-        return pattern.sub(replacer, self.template_model.template)
+        result = pattern.sub(replacer, self.template_model.template)
+        return cast(str, result)
 
     def validate_value(self, pattern: str, value: str) -> None:
         if not bool(re.fullmatch(pattern, value)):

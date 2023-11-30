@@ -1,3 +1,4 @@
+from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -75,7 +76,7 @@ from src.camel_case_transformer import CamelCaseTransformer
         id='transform with numbers'
     ),
 ])
-def test_transform_default(original, expected):
+def test_transform_default(original: Any, expected: Any) -> None:
     result = CamelCaseTransformer.transform(original)
     assert result == expected
 
@@ -94,21 +95,21 @@ def test_transform_default(original, expected):
         id='when is_lower is false'
     ),
 ])
-def test_transform(is_lower, expected):
+def test_transform(is_lower: Any, expected: Any) -> None:
     original = ('  Lorem ipsum dolorSITAmet   consectetur / adipiscing '
                 'elit123sedDO eiusmodTemporIncididunt uT labore   ')
     result = CamelCaseTransformer.transform(original, is_lower=is_lower)
     assert result == expected
 
 
-def test_lower_camelcase():
+def test_lower_camelcase() -> None:
     with (patch('src.camel_case_transformer.CamelCaseTransformer.transform')
           as mock_transform):
         CamelCaseTransformer.lower("lorem")
         mock_transform.assert_called_with("lorem", is_lower=True)
 
 
-def test_upper_camelcase():
+def test_upper_camelcase() -> None:
     with (patch('src.camel_case_transformer.CamelCaseTransformer.transform')
           as mock_transform):
         CamelCaseTransformer.upper("lorem")

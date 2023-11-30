@@ -1,7 +1,9 @@
+from pytest_mock import MockerFixture
+
 from src.array_template_arguments import ArrayTemplateArguments
 
 
-def test_array_template_arguments_init(mocker):
+def test_array_template_arguments_init(mocker: MockerFixture) -> None:
     mock_add_argument_model = mocker.patch(
         'src.argument_parser_utilities.ArgumentParserExt.add_argument_model')
 

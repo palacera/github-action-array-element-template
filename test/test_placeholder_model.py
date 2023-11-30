@@ -1,9 +1,11 @@
+from typing import Any
+
 import pytest
 
 from src.placeholder_model import PlaceholderModel
 
 
-def test_valid_inputs():
+def test_valid_inputs() -> None:
     PlaceholderModel(
         text="lorem",
         left_delimiter="[[",
@@ -33,7 +35,11 @@ def test_valid_inputs():
         id='placeholder text is blank string'
     ),
 ])
-def test_invalid_text(value, exception, exception_msg):
+def test_invalid_text(
+        value: Any,
+        exception: Any,
+        exception_msg: Any,
+) -> None:
     with pytest.raises(exception, match=exception_msg):
         PlaceholderModel(
             text=value,
@@ -64,7 +70,11 @@ def test_invalid_text(value, exception, exception_msg):
         id='placeholder text is blank string'
     ),
 ])
-def test_invalid_left_delimiter(value, exception, exception_msg):
+def test_invalid_left_delimiter(
+        value: Any,
+        exception: Any,
+        exception_msg: Any,
+) -> None:
     with pytest.raises(exception, match=exception_msg):
         PlaceholderModel(
             text="lorem",
@@ -95,7 +105,11 @@ def test_invalid_left_delimiter(value, exception, exception_msg):
         id='placeholder text is blank string'
     ),
 ])
-def test_invalid_right_delimiter(value, exception, exception_msg):
+def test_invalid_right_delimiter(
+        value: Any,
+        exception: Any,
+        exception_msg: Any,
+) -> None:
     with pytest.raises(exception, match=exception_msg):
         PlaceholderModel(
             text="lorem",
@@ -126,7 +140,11 @@ def test_invalid_right_delimiter(value, exception, exception_msg):
         id='placeholder text is blank string'
     ),
 ])
-def test_invalid_key_delimiter(value, exception, exception_msg):
+def test_invalid_key_delimiter(
+        value: Any,
+        exception: Any,
+        exception_msg: Any,
+) -> None:
     with pytest.raises(exception, match=exception_msg):
         PlaceholderModel(
             text="lorem",
@@ -163,7 +181,12 @@ def test_invalid_key_delimiter(value, exception, exception_msg):
         id='test 6'
     ),
 ])
-def test_non_unique_attributes(text, left_delimiter, right_delimiter, key_delimiter):
+def test_non_unique_attributes(
+        text: Any,
+        left_delimiter: Any,
+        right_delimiter: Any,
+        key_delimiter: Any,
+) -> None:
     with pytest.raises(
             ValueError,
             match='All placeholder attributes must have unique values.'

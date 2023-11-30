@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 
 from src.string_utilities import separate_words, replace_word_delimiters
@@ -34,7 +36,12 @@ from src.string_utilities import separate_words, replace_word_delimiters
     ),
     # TODO test pattern
 ])
-def test_replace_word_delimiters(delimiter, pattern, original, expected):
+def test_replace_word_delimiters(
+        delimiter: Any,
+        pattern: Any,
+        original: Any,
+        expected: Any,
+) -> None:
     if pattern is None:
         result = replace_word_delimiters(original, delimiter)
     else:
@@ -109,6 +116,6 @@ def test_replace_word_delimiters(delimiter, pattern, original, expected):
         id='separate words when including word delimiters'
     ),
 ])
-def test_separate_words(original, expected):
+def test_separate_words(original: Any, expected: Any) -> None:
     result = separate_words(original)
     assert result == expected
