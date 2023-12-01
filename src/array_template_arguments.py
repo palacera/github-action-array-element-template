@@ -53,7 +53,7 @@ class ArrayTemplateArguments(ArgumentParserExt):
         is_required=False,
     )
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.add_argument_model(self.array_argument_model)
         self.add_argument_model(self.template_argument_model)

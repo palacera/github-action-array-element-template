@@ -6,7 +6,8 @@ from src.string_utilities import separate_words, replace_word_delimiters
 class CamelCaseTransformer:
 
     @staticmethod
-    def _to_camel_case(segment, is_lower=True):
+    def _to_camel_case(segment: str, is_lower: bool = True) -> str:
+
         words = segment.strip().lower().split()
         if not words:
             return ""
@@ -19,7 +20,7 @@ class CamelCaseTransformer:
         return camel_case_segment
 
     @staticmethod
-    def transform(s, is_lower=True):
+    def transform(s: str, is_lower: bool = True) -> str:
 
         s = separate_words(s, ' ')
         s = replace_word_delimiters(s, ' ')
@@ -41,9 +42,9 @@ class CamelCaseTransformer:
             if delimiter_search else transformed_segments[0]
 
     @staticmethod
-    def lower(s):
+    def lower(s: str) -> str:
         return CamelCaseTransformer.transform(s, is_lower=True)
 
     @staticmethod
-    def upper(s):
+    def upper(s: str) -> str:
         return CamelCaseTransformer.transform(s, is_lower=False)

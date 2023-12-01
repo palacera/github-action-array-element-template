@@ -1,11 +1,13 @@
 import inspect
+from typing import Any
+
 import pytest
 from unittest.mock import Mock
 from src.template_processor import TemplateProcessor
 
 
 @pytest.fixture
-def mock_placeholder_model():
+def mock_placeholder_model() -> Mock:
     return Mock(
         text='element',
         left_delimiter='{{',
@@ -15,7 +17,7 @@ def mock_placeholder_model():
 
 
 @pytest.fixture
-def mock_template_model(mock_placeholder_model):
+def mock_template_model(mock_placeholder_model: Mock) -> Mock:
     return Mock(
         array=[],
         case='none',
@@ -27,7 +29,9 @@ def mock_template_model(mock_placeholder_model):
 
 
 @pytest.fixture
-def template_processor_instance(mock_template_model):
+def template_processor_instance(
+        mock_template_model: Mock
+) -> TemplateProcessor:
     return TemplateProcessor(mock_template_model)
 
 
@@ -71,8 +75,13 @@ class TestTemplateProcessor(object):
         ),
     ])
     def test_validate_array(
-            self, mock_template_model, original,
-            expected, exception, exception_msg):
+            self,
+            mock_template_model: Mock,
+            original: Any,
+            expected: Any,
+            exception: Any,
+            exception_msg: Any,
+    ) -> None:
         mock_template_model.array = original
 
         if exception:
@@ -135,13 +144,19 @@ class TestTemplateProcessor(object):
                 None,
                 'ThisIs justATest',
                 '', ValueError,
-                'Invalid case. Accepted cases are: upper, lower, pascal, camel.',
+                'Invalid case. Accepted cases are: upper, lower, pascal, camel.', # noqa
                 id='test case invalid None'
             ),
         ])
     def test_transform_cases(
-            self, template_processor_instance, case_mode, original,
-            expected, exception, exception_msg):
+            self,
+            template_processor_instance: TemplateProcessor,
+            case_mode: Any,
+            original: Any,
+            expected: Any,
+            exception: Any,
+            exception_msg: Any,
+    ) -> None:
         if exception:
             with pytest.raises(exception, match=exception_msg):
                 template_processor_instance.transform_case(original, case_mode)
@@ -150,7 +165,10 @@ class TestTemplateProcessor(object):
                                                                 case_mode)
             assert result == expected
 
-    def test_transform_case_default(self, template_processor_instance):
+    def test_transform_case_default(
+            self,
+            template_processor_instance: TemplateProcessor,
+    ) -> None:
         sig = inspect.signature(template_processor_instance.transform_case)
         default_value = sig.parameters['mode'].default
         assert default_value == 'none'
@@ -207,9 +225,14 @@ class TestTemplateProcessor(object):
             ),
         ])
     def test_get_nested_value(
-            self, template_processor_instance,
-            element, key, expected, exception, exception_msg
-    ):
+            self,
+            template_processor_instance: TemplateProcessor,
+            element: Any,
+            key: Any,
+            expected: Any,
+            exception: Any,
+            exception_msg: Any,
+    ) -> None:
         result = template_processor_instance.get_nested_value(element, key)
         assert result == expected
 
@@ -253,9 +276,15 @@ class TestTemplateProcessor(object):
                                      id='template with multiple replacements'
                                  ),
                              ])
-    def test_generate_output_template_variations(self, mock_template_model,
-                                                 template, original, expected,
-                                                 exception, exception_msg):
+    def test_generate_output_template_variations(
+            self,
+            mock_template_model: Mock,
+            template: Any,
+            original: Any,
+            expected: Any,
+            exception: Any,
+            exception_msg: Any,
+    ) -> None:
         mock_template_model.template = template
         processor = TemplateProcessor(mock_template_model)
         processor.template_model.array = original
@@ -344,9 +373,16 @@ class TestTemplateProcessor(object):
                                  ),
                              ])
     def test_generate_output_word_delimiter_case_variations(
-            self, mock_template_model, template, word_delimiter, case,
-            original, expected, exception, exception_msg):
-
+            self,
+            mock_template_model: Mock,
+            template: Any,
+            word_delimiter: Any,
+            case: Any,
+            original: Any,
+            expected: Any,
+            exception: Any,
+            exception_msg: Any,
+    ) -> None:
         mock_template_model.word_delimiter = word_delimiter
         mock_template_model.case = case
         mock_template_model.template = template
@@ -355,7 +391,7 @@ class TestTemplateProcessor(object):
         result = processor.generate_output()
         assert result == expected
 
-    def test_returns_correct_case(self, mock_template_model):
+    def test_returns_correct_case(self, mock_template_model: Mock) -> None:
         mock_template_model.case = 'upper'
         processor = TemplateProcessor(mock_template_model)
         processor.template_model.array = ['ipsum', 'sit']
